@@ -1,1 +1,1 @@
-It's practice app.
+It's practice app from book "Android Programming".
