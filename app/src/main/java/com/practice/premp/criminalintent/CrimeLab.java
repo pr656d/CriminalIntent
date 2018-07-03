@@ -25,29 +25,39 @@ public class CrimeLab {
     } // get() end.
 
     private CrimeLab(Context context) {
+        // Initialize mCrimes and load data into it.
+
         mCrimes = new ArrayList<>();
         loadCrimes();
-    }
+
+    } // CrimeLab() end.
 
     public List<Crime> getCrimes() {
         return mCrimes;
     }
 
     public Crime getCrime(UUID id) {
+        // Returns crime object by id.
+
         for (Crime crime : mCrimes) {
             if (crime.getId().equals(id)) {
                 return crime;
             }
         }
+
         return null;
+
     } // getCrime() end.
 
     private void loadCrimes() {
+        // Adding crime object to mCrimes array.
+
         for (int i = 0; i < 100; i++) {
             Crime crime = new Crime();
             crime.setTitle("Crime #" + i);
             crime.setSolved(i % 2 == 0);    // Every other one
             mCrimes.add(crime);
         }
+
     } // loadCrimes() end.
 }

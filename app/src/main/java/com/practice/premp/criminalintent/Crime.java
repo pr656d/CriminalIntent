@@ -4,15 +4,20 @@ import java.util.Date;
 import java.util.UUID;
 
 public class Crime {
+
+    // Declarations.
     private UUID mId;
     private String mTitle;
     private Date mDate;
     private boolean mSolved;
 
     public Crime() {
+        // Constructor generates random id and current date to assign appropriately.
+
         mId = UUID.randomUUID();
         mDate = new Date();
-    }
+
+    } // Crime() end.
 
     public UUID getId() {
         return mId;
