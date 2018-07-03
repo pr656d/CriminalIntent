@@ -7,8 +7,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 public abstract class SingleFragmentActivity extends AppCompatActivity {
+    // TAGS
     private String TAG = "SingleFragmentActivity";
 
+    // abstract declarations.
     protected abstract Fragment createFragment();
 
     @Override
