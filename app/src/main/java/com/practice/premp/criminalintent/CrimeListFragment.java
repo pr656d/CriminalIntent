@@ -93,9 +93,11 @@ public class CrimeListFragment extends Fragment {
         @Override
         public void onClick(View v) {
             Log.d(TAG, ".onClick() called.");
-//            Toast.makeText(getActivity(), mCrime.getTitle() + " Clicked!", Toast.LENGTH_SHORT)
-//                    .show();
-            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
+            // This method will start CrimeActivity.
+//            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
+
+            // This method will start CrimePagerActivity.
+            Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
             startActivity(intent);
         } // onClick() end.
 
