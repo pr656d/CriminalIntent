@@ -11,6 +11,7 @@ public class CrimeActivity extends SingleFragmentActivity {
     // CONSTANTS
     private static final String EXTRA_CRIME_ID = "com.practice.premp.criminalintent.crime_id";
 
+    // Creating and returning new intent.
     public static Intent newIntent(Context packageContext, UUID crimeId) {
         // Creating new intent with putting crimeId and returning new intent.
 

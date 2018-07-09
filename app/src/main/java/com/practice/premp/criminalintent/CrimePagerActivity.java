@@ -15,12 +15,14 @@ import java.util.UUID;
 
 public class CrimePagerActivity extends AppCompatActivity {
 
+    // CONSTANTS
+    private static final String EXTRA_CRIME_ID =
+            "com.practice.premp.criminalintent.crime_id";
+
     // Declarations
     private ViewPager mViewPager;
     private List<Crime> mCrimes;
 
-    private static final String EXTRA_CRIME_ID =
-            "com.practice.premp.criminalintent.crime_id";
 
     // Creating new intent
     public static Intent newIntent(Context packageContext, UUID crimeId) {
@@ -65,5 +67,5 @@ public class CrimePagerActivity extends AppCompatActivity {
                 break;
             }
         }
-    }
+    } // setCrime() end.
 }
