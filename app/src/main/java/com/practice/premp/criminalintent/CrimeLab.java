@@ -29,9 +29,13 @@ public class CrimeLab {
         // Initialize mCrimes and load data into it.
 
         mCrimes = new ArrayList<>();
-        loadCrimes();
+//        loadCrimes();
 
     } // CrimeLab() end.
+
+    public void addCrime(Crime c) {
+        mCrimes.add(c);
+    }
 
     public List<Crime> getCrimes() {
         return mCrimes;
