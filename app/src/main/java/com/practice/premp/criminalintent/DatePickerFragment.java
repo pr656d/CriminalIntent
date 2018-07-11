@@ -34,7 +34,7 @@ public class DatePickerFragment extends DialogFragment {
         fragment.setArguments(args);
         return fragment;
 
-    } // DatePickerFragment() end.
+    } // newInstance() end.
 
     @NonNull
     @Override

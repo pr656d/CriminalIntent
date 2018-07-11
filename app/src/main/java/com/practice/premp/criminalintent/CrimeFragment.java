@@ -28,13 +28,17 @@ public class CrimeFragment extends Fragment {
     // CONSTANTS
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
+    private static final String DIALOG_DELETE = "DeleteCrime";
 
-    private static final int REQUEST_CODE = 0;
+    // REQUEST CODES
+    private static final int DATE_REQUEST_CODE = 0;
+    private static final int DELETE_REQUEST_CODE = 1;
 
     // Declaration
     private Crime mCrime;
     private EditText mTitleField;
     private Button mDateButton;
+    private Button mDeleteButton;
     private CheckBox mSolvedCheckBox;
 
     public static CrimeFragment newInstance(UUID crimeId) {
@@ -94,7 +98,7 @@ public class CrimeFragment extends Fragment {
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
                 DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
-                dialog.setTargetFragment(CrimeFragment.this, REQUEST_CODE);
+                dialog.setTargetFragment(CrimeFragment.this, DATE_REQUEST_CODE);
                 dialog.show(manager, DIALOG_DATE);
             }
         });
@@ -109,6 +113,18 @@ public class CrimeFragment extends Fragment {
             }
         }); // mSolvedCheckButton end.
 
+        // Delete button
+        mDeleteButton = v.findViewById(R.id.crime_delete);
+        mDeleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager manager = getFragmentManager();
+                DeleteCrimeFragment dialog = DeleteCrimeFragment.newIntent(mCrime.getId());
+                dialog.setTargetFragment(CrimeFragment.this, DELETE_REQUEST_CODE);
+                dialog.show(manager, DIALOG_DELETE);
+            }
+        });
+
         return v;
 
     }   // onCreateView end.
@@ -119,10 +135,21 @@ public class CrimeFragment extends Fragment {
             return;
         }
 
-        if (requestCode == REQUEST_CODE) {
-            Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
-            mCrime.setDate(date);
-            updateDate();
+//        if (requestCode == DATE_REQUEST_CODE) {
+//            Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+//            mCrime.setDate(date);
+//            updateDate();
+//        }
+
+        switch (requestCode) {
+            case DATE_REQUEST_CODE:
+                Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+                mCrime.setDate(date);
+                updateDate();
+                break;
+            case DELETE_REQUEST_CODE:
+                getActivity().finish();
+                break;
         }
     } // onActivityResult() end.
 

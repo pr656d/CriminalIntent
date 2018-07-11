@@ -54,6 +54,19 @@ public class CrimeLab {
 
     } // getCrime() end.
 
+    public void deleteCrime(UUID crimeId) {
+        for (int i = 0; i < mCrimes.size(); i++) {
+            if (mCrimes.get(i).getId() == crimeId) {
+                mCrimes.remove(i);
+                break;
+            }
+        }
+    }
+
+    /**
+     *
+     * For adding crimes into list manually.
+
     private void loadCrimes() {
         // Adding crime object to mCrimes array.
 
@@ -65,4 +78,6 @@ public class CrimeLab {
         }
 
     } // loadCrimes() end.
+
+     */
 }
