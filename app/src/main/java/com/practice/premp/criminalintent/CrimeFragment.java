@@ -135,12 +135,6 @@ public class CrimeFragment extends Fragment {
             return;
         }
 
-//        if (requestCode == DATE_REQUEST_CODE) {
-//            Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
-//            mCrime.setDate(date);
-//            updateDate();
-//        }
-
         switch (requestCode) {
             case DATE_REQUEST_CODE:
                 Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
