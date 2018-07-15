@@ -29,6 +29,7 @@ public class CrimeLab {
         // Initialize mCrimes and load data into it.
 
         mCrimes = new ArrayList<>();
+
 //        loadCrimes();
 
     } // CrimeLab() end.
@@ -55,13 +56,14 @@ public class CrimeLab {
     } // getCrime() end.
 
     public void deleteCrime(UUID crimeId) {
+        // Finds crime by id and deletes at the index.
         for (int i = 0; i < mCrimes.size(); i++) {
             if (mCrimes.get(i).getId() == crimeId) {
                 mCrimes.remove(i);
                 break;
             }
         }
-    }
+    } // deleteCrime() end.
 
     /**
      *
