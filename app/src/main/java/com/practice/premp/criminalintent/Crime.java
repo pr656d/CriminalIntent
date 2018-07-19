@@ -12,12 +12,13 @@ public class Crime {
     private boolean mSolved;
 
     public Crime() {
-        // Constructor generates random id and current date to assign appropriately.
-
-        mId = UUID.randomUUID();
-        mDate = new Date();
-
+        this(UUID.randomUUID());
     } // Crime() end.
+
+    public Crime(UUID uuid) {
+        mId = uuid;
+        mDate = new Date();
+    }
 
     public UUID getId() {
         return mId;

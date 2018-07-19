@@ -1,6 +1,13 @@
 package com.practice.premp.criminalintent;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.practice.premp.criminalintent.database.CrimeBaseHelper;
+import com.practice.premp.criminalintent.database.CrimeCursorWrapper;
+import com.practice.premp.criminalintent.database.CrimeDbSchema.CrimeTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +18,9 @@ public class CrimeLab {
     // static object declaration.
     private static CrimeLab sCrimeLab;
 
-    // Data holder variable.
-    private List<Crime> mCrimes;
+    // DECLARATIONS
+    private Context mContext;
+    private SQLiteDatabase mDatabase;
 
     public static CrimeLab get(Context context) {
         // Initializes sCrimeLab object if already not exist.
@@ -26,60 +34,90 @@ public class CrimeLab {
     } // get() end.
 
     private CrimeLab(Context context) {
-        // Initialize mCrimes and load data into it.
-
-        mCrimes = new ArrayList<>();
-
-//        loadCrimes();
+        mContext = context.getApplicationContext();
+        mDatabase = new CrimeBaseHelper(mContext).getWritableDatabase();
 
     } // CrimeLab() end.
 
     public void addCrime(Crime c) {
-        mCrimes.add(c);
+        ContentValues values = getContentValues(c);
+        mDatabase.insert(CrimeTable.NAME, null, values);
     }
 
     public List<Crime> getCrimes() {
-        return mCrimes;
+        List<Crime> crimes = new ArrayList<>();
+
+        CrimeCursorWrapper cursor = queryCrimes(null, null);
+
+        try {
+            cursor.moveToFirst();
+            while(!cursor.isAfterLast()) {
+                crimes.add(cursor.getCrime());
+                cursor.moveToNext();
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return crimes;
     }
 
     public Crime getCrime(UUID id) {
-        // Returns crime object by id.
+        CrimeCursorWrapper cursor = queryCrimes(
+                CrimeTable.Cols.UUID + " = ?",
+                new String[] {id.toString()}
+        );
 
-        for (Crime crime : mCrimes) {
-            if (crime.getId().equals(id)) {
-                return crime;
+        try {
+            if (cursor.getCount() == 0) {
+                return null;
             }
+            cursor.moveToFirst();
+            return cursor.getCrime();
+        } finally {
+            cursor.close();
         }
-
-        return null;
-
     } // getCrime() end.
 
+    public void updateCrime(Crime crime) {
+        String uuidString = crime.getId().toString();
+        ContentValues values = getContentValues(crime);
+
+        mDatabase.update(CrimeTable.NAME, values,
+                CrimeTable.Cols.UUID + " = ?",
+                new String[] {uuidString});
+    } // updateCrime() end.
+
+    private CrimeCursorWrapper queryCrimes(String whereClause, String[] whereArgs) {
+        Cursor cursor = mDatabase.query(
+                CrimeTable.NAME,
+                null, // null selects all columns.
+                whereClause,
+                whereArgs,
+                null,
+                null,
+                null
+        );
+
+        return new CrimeCursorWrapper(cursor);
+    } // queryCrime() end.
+
+    private static ContentValues getContentValues(Crime crime) {
+        ContentValues values = new ContentValues();
+        values.put(CrimeTable.Cols.UUID, crime.getId().toString());
+        values.put(CrimeTable.Cols.TITLE, crime.getTitle());
+        values.put(CrimeTable.Cols.DATE, crime.getDate().getTime());
+        values.put(CrimeTable.Cols.SOLVED, crime.isSolved() ? 1 : 0);
+
+        return values;
+    }
+
     public void deleteCrime(UUID crimeId) {
-        // Finds crime by id and deletes at the index.
-        for (int i = 0; i < mCrimes.size(); i++) {
-            if (mCrimes.get(i).getId() == crimeId) {
-                mCrimes.remove(i);
-                break;
-            }
-        }
+        mDatabase.delete(
+                CrimeTable.NAME,
+                CrimeTable.Cols.UUID + " = ?",
+                new String[] {crimeId.toString()}
+                );
     } // deleteCrime() end.
 
-    /**
-     *
-     * For adding crimes into list manually.
-
-    private void loadCrimes() {
-        // Adding crime object to mCrimes array.
-
-        for (int i = 0; i < 100; i++) {
-            Crime crime = new Crime();
-            crime.setTitle("Crime #" + i);
-            crime.setSolved(i % 2 == 0);    // Every other one
-            mCrimes.add(crime);
-        }
-
-    } // loadCrimes() end.
-
-     */
 }
