@@ -19,7 +19,7 @@
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/crime_photo"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
@@ -39,15 +39,15 @@
         android:id="@+id/textView2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:text="@string/crime_details_label"
         android:textAlignment="viewStart"
         android:textAllCaps="true"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/crime_title"
-        app:layout_constraintStart_toStartOf="@+id/crime_title"
-        app:layout_constraintTop_toBottomOf="@+id/crime_title" />
+        app:layout_constraintStart_toStartOf="@+id/crime_camera"
+        app:layout_constraintTop_toBottomOf="@+id/crime_camera" />
 
     <Button
         android:id="@+id/crime_date"
@@ -113,5 +113,26 @@
         app:layout_constraintEnd_toEndOf="@+id/crime_solved"
         app:layout_constraintStart_toStartOf="@+id/crime_solved"
         app:layout_constraintTop_toBottomOf="@+id/crime_solved" />
+
+    <ImageButton
+        android:id="@+id/crime_camera"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="@+id/crime_photo"
+        app:layout_constraintStart_toStartOf="@+id/crime_photo"
+        app:layout_constraintTop_toBottomOf="@+id/crime_photo"
+        app:srcCompat="@android:drawable/ic_menu_camera" />
+
+    <ImageView
+        android:id="@+id/crime_photo"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginStart="8dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textView"
+        app:srcCompat="@android:color/darker_gray" />
 
 </android.support.constraint.ConstraintLayout>

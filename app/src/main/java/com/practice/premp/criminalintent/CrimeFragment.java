@@ -3,14 +3,18 @@ package com.practice.premp.criminalintent;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -21,8 +25,12 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
+import java.io.File;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class CrimeFragment extends Fragment {
@@ -36,18 +44,22 @@ public class CrimeFragment extends Fragment {
     private static final String DIALOG_DELETE = "DeleteCrime";
 
     // REQUEST CODES
-    private static final int DATE_REQUEST_CODE = 0;
-    private static final int DELETE_REQUEST_CODE = 1;
-    public static final int SUSPECT_REQUEST_CODE = 2;
+    private static final int REQUEST_DATE = 0;
+    private static final int REQUEST_CONTACT = 1;
+    private static final int REQUEST_SUSPECT = 2;
+    private static final int REQUEST_PHOTO = 3;
 
     // Declaration
     private Crime mCrime;
+    private File mPhotoFile;
     private EditText mTitleField;
     private Button mDateButton;
     private Button mDeleteButton;
     private CheckBox mSolvedCheckBox;
     private Button mSuspectButton;
     private Button mReportButton;
+    private ImageButton mPhotoButton;
+    private ImageView mPhotoView;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         // Creating CrimeFragment with crimeId arguments and returning new CrimeFragment.
@@ -67,7 +79,7 @@ public class CrimeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
-
+        mPhotoFile = CrimeLab.get(getActivity()).getPhotoFile(mCrime);
     }   // onCreate end.
 
     @Override
@@ -114,7 +126,7 @@ public class CrimeFragment extends Fragment {
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
                 DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
-                dialog.setTargetFragment(CrimeFragment.this, DATE_REQUEST_CODE);
+                dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
                 dialog.show(manager, DIALOG_DATE);
             }
         });
@@ -136,7 +148,7 @@ public class CrimeFragment extends Fragment {
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
                 DeleteCrimeFragment dialog = DeleteCrimeFragment.newIntent(mCrime.getId());
-                dialog.setTargetFragment(CrimeFragment.this, DELETE_REQUEST_CODE);
+                dialog.setTargetFragment(CrimeFragment.this, REQUEST_CONTACT);
                 dialog.show(manager, DIALOG_DELETE);
             }
         });
@@ -148,7 +160,7 @@ public class CrimeFragment extends Fragment {
         mSuspectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(pickContact, SUSPECT_REQUEST_CODE);
+                startActivityForResult(pickContact, REQUEST_SUSPECT);
             }
         });
         // Check if we have already suspect in data.
@@ -158,7 +170,7 @@ public class CrimeFragment extends Fragment {
 
         // Check if any contacts app available or not to choose contact.
         // Disable suspect button if no app available for selecting contacts.
-        PackageManager packageManager = getActivity().getPackageManager();
+        final PackageManager packageManager = getActivity().getPackageManager();
         if (packageManager.resolveActivity(pickContact,
                 PackageManager.MATCH_DEFAULT_ONLY) == null) {
             mSuspectButton.setEnabled(false);
@@ -179,6 +191,42 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        // Photo Button
+        mPhotoButton = v.findViewById(R.id.crime_camera);
+        final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        boolean canTakePhoto =
+                mPhotoFile != null
+                &&
+                captureImage.resolveActivity(packageManager) != null;
+
+        mPhotoButton.setEnabled(canTakePhoto);
+
+        mPhotoButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Uri uri = FileProvider.getUriForFile(getActivity(),
+                        "com.practice.premp.criminalintent.fileprovider",
+                        mPhotoFile);
+                captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+
+                List<ResolveInfo> cameraActivities = getActivity()
+                        .getPackageManager().queryIntentActivities(captureImage,
+                                packageManager.MATCH_DEFAULT_ONLY);
+
+                for (ResolveInfo activity : cameraActivities) {
+                    getActivity().grantUriPermission(activity.activityInfo.packageName,
+                            uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                }
+
+                startActivityForResult(captureImage, REQUEST_PHOTO);
+            }
+        });
+
+        // Photo Image View
+        mPhotoView = v.findViewById(R.id.crime_photo);
+        updatePhotoView();
+
         return v;
 
     }   // onCreateView end.
@@ -192,17 +240,17 @@ public class CrimeFragment extends Fragment {
         switch (requestCode) {
 
             // Date result.
-            case DATE_REQUEST_CODE:
+            case REQUEST_DATE:
                 Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
                 mCrime.setDate(date);
                 updateDate();
                 break;
 
-            case DELETE_REQUEST_CODE:
+            case REQUEST_CONTACT:
                 getActivity().finish();
                 break;
 
-            case SUSPECT_REQUEST_CODE:
+            case REQUEST_SUSPECT:
                 Uri contactUri = data.getData();
                 // Specify which fields you want your query to return values for
                 String[] queryFields = new String[] {
@@ -227,6 +275,14 @@ public class CrimeFragment extends Fragment {
                 }
 
                 break;
+
+            case REQUEST_PHOTO:
+                Uri uri = FileProvider.getUriForFile(getActivity(),
+                        "com.practice.premp.criminalintent.fileprovider", mPhotoFile);
+
+                getActivity().revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+                updatePhotoView();
         }
     } // onActivityResult() end.
 
@@ -260,4 +316,14 @@ public class CrimeFragment extends Fragment {
         return report;
 
     } // getCrimeReport() end.
+
+    private void updatePhotoView() {
+        // Checking existence of file. If exist then set image by scaling down.
+        if (mPhotoFile == null || !mPhotoFile.exists()) {
+            mPhotoView.setImageDrawable(null);
+        } else {
+            Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
+            mPhotoView.setImageBitmap(bitmap);
+        }
+    } // updatePhotoView() end.
 }
