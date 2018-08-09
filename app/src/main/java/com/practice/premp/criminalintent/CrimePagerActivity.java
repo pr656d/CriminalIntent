@@ -71,6 +71,17 @@ public class CrimePagerActivity extends AppCompatActivity implements CrimeFragme
 
     @Override
     public void onCrimeUpdated(Crime crime) {
-        // It will remain empty.
+        /**
+         *  It will remain empty. We don't need to update here in phone mode.
+         */
     } // onCrimeUpdated() end.
+
+    @Override
+    public void onCrimeDeleted() {
+        /**
+         *  We don't need to delete fragment in phone mode,
+         *  We'll remove activity and return to list activity.
+         */
+        finish();
+    } // onCrimeDeleted();
 }

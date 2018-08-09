@@ -69,6 +69,7 @@ public class CrimeFragment extends Fragment {
 
     public interface CallBacks {
         void onCrimeUpdated(Crime crime);
+        void onCrimeDeleted();
     }
 
     public static CrimeFragment newInstance(UUID crimeId) {
@@ -310,7 +311,7 @@ public class CrimeFragment extends Fragment {
 
             case REQUEST_DELETE:
                 mCallBacks.onCrimeUpdated(mCrime);
-//                getActivity().finish();
+                mCallBacks.onCrimeDeleted();
                 break;
         }
     } // onActivityResult() end.
