@@ -1,6 +1,6 @@
 package com.practice.premp.criminalintent;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -32,6 +32,21 @@ public class CrimeListFragment extends Fragment {
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
     private boolean mSubtitleVisible;
+    private CallBacks mCallBacks;
+
+    /**
+     * Required interface for hosting activities
+     */
+
+    public interface CallBacks {
+        void onCrimeSelected(Crime crime);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallBacks = (CallBacks) context;
+    } // onAttach() end.
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,7 +58,7 @@ public class CrimeListFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, ".onCreateView called.");
+//        Log.d(TAG, ".onCreateView called.");
 
         View view = inflater.inflate(R.layout.fragment_crime_list, container, false);
         mCrimeRecyclerView = view.findViewById(R.id.crime_recycler_view);
@@ -71,6 +86,12 @@ public class CrimeListFragment extends Fragment {
     } // onSaveInstanceState() end.
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallBacks = null;
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_crime_list, menu);
@@ -90,8 +111,8 @@ public class CrimeListFragment extends Fragment {
             case R.id.new_crime:
                 Crime crime = new Crime();
                 CrimeLab.get(getActivity()).addCrime(crime);
-                Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
-                startActivity(intent);
+                updateUI();
+                mCallBacks.onCrimeSelected(crime);
                 return true;
 
             case R.id.show_subtitle:
@@ -122,9 +143,9 @@ public class CrimeListFragment extends Fragment {
 
     } // updateSubtitle() end.
 
-    private void updateUI() {
+    public void updateUI() {
         // Updates UI when fragment starts or data changes.
-        Log.d(TAG, ".updateUI() called.");
+//        Log.d(TAG, ".updateUI() called.");
 
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
@@ -161,7 +182,7 @@ public class CrimeListFragment extends Fragment {
         } // CrimeHolder() end.
 
         public void bind(Crime crime) {
-            Log.d(TAG, ".bind() called.");
+//            Log.d(TAG, ".bind() called.");
 
             mCrime = crime;
             mTitleTextView.setText(mCrime.getTitle());
@@ -171,13 +192,8 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Log.d(TAG, ".onClick() called.");
-            // This method will start CrimeActivity.
-//            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
-
-            // This method will start CrimePagerActivity.
-            Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
-            startActivity(intent);
+//            Log.d(TAG, ".onClick() called.");
+            mCallBacks.onCrimeSelected(mCrime);
         } // onClick() end.
 
     } // CrimeHolder end.
@@ -186,14 +202,14 @@ public class CrimeListFragment extends Fragment {
         private List<Crime> mCrimes;
 
         public CrimeAdapter(List<Crime> crimes) {
-            Log.d(TAG, ".CrimeAdapter() called.");
+//            Log.d(TAG, ".CrimeAdapter() called.");
             mCrimes = crimes;
         } // CrimeAdapter() end.
 
         @NonNull
         @Override
         public CrimeHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            Log.d(TAG, ".onCreateViewHolder() called.");
+//            Log.d(TAG, ".onCreateViewHolder() called.");
 
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
 
@@ -202,14 +218,14 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull CrimeHolder holder, int position) {
-            Log.d(TAG, ".onBindViewHolder() called.");
+//            Log.d(TAG, ".onBindViewHolder() called.");
             Crime crime = mCrimes.get(position);
             holder.bind(crime);
         } // onBindViewHolder() end.
 
         @Override
         public int getItemCount() {
-            Log.d(TAG, ".getItemCount() called.");
+//            Log.d(TAG, ".getItemCount() called.");
             return mCrimes.size();
         } // getItemCount() end.
 

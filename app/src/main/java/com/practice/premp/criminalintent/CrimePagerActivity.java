@@ -13,7 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import java.util.List;
 import java.util.UUID;
 
-public class CrimePagerActivity extends AppCompatActivity {
+public class CrimePagerActivity extends AppCompatActivity implements CrimeFragment.CallBacks {
 
     // CONSTANTS
     private static final String EXTRA_CRIME_ID =
@@ -68,4 +68,9 @@ public class CrimePagerActivity extends AppCompatActivity {
             }
         }
     } // setCrime() end.
+
+    @Override
+    public void onCrimeUpdated(Crime crime) {
+        // It will remain empty.
+    } // onCrimeUpdated() end.
 }
