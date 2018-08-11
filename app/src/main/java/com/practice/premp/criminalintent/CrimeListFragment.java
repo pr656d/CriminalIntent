@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.UUID;
 
 public class CrimeListFragment extends Fragment {
 
@@ -69,6 +71,22 @@ public class CrimeListFragment extends Fragment {
         }
 
         updateUI();
+
+        // Swipe to delete item from list.
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
+                        0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                UUID uuid = (UUID) viewHolder.itemView.getTag();
+                CrimeLab.get(getActivity()).deleteCrime(uuid);
+                updateUI();
+            }
+        }).attachToRecyclerView(mCrimeRecyclerView);
 
         return view;
     } // onCreateView end.
@@ -188,6 +206,7 @@ public class CrimeListFragment extends Fragment {
             mTitleTextView.setText(mCrime.getTitle());
             mDateTextView.setText(mCrime.getDate().toString());
             mSolved.setVisibility(crime.isSolved() ? View.INVISIBLE : View.VISIBLE);
+            itemView.setTag(mCrime.getId());
         } // bind() end.
 
         @Override
